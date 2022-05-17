@@ -23,17 +23,15 @@ route.get('/:id', (req, res) => {
   res.status(200).json(talker[0]);
 });
 
-route.use(middlewares.authorization);
-
-route.post('/', middlewares.nameValidation, async (req, res) => {
+route.post('/', middlewares.authorization, middlewares.nameValidation,
+middlewares.ageValidation, middlewares.talkValidation, (req, res) => {
   const { name, age, talk } = req.body;
   const { watchedAt, rate } = talk;
   const talker = JSON.parse(fs.readFileSync('talker.json', 'utf-8'));
   const id = talker.length + 1;
   const newTalker = [...talker, { name, age, id, talk: { watchedAt, rate } }];
-  await fs.writeFile('talker.json', newTalker);
-  console.log('new', newTalker);
-  res.status(201).json({ name, age, id, talk: { watchedAt, rate } });
+  fs.writeFileSync('talker.json', JSON.stringify(newTalker));
+  return res.status(201).json({ name, age, id, talk: { watchedAt, rate } });
 });
 
 module.exports = route;
