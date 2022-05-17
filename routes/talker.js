@@ -24,7 +24,8 @@ route.get('/:id', (req, res) => {
 });
 
 route.post('/', middlewares.authorization, middlewares.nameValidation,
-middlewares.ageValidation, middlewares.talkValidation, (req, res) => {
+middlewares.ageValidation, middlewares.talkValidation,
+ middlewares.watchedAtRateValidation, (req, res) => {
   const { name, age, talk } = req.body;
   const { watchedAt, rate } = talk;
   const talker = JSON.parse(fs.readFileSync('talker.json', 'utf-8'));
@@ -32,6 +33,13 @@ middlewares.ageValidation, middlewares.talkValidation, (req, res) => {
   const newTalker = [...talker, { name, age, id, talk: { watchedAt, rate } }];
   fs.writeFileSync('talker.json', JSON.stringify(newTalker));
   return res.status(201).json({ name, age, id, talk: { watchedAt, rate } });
-});
+});/* 
 
+route.put('/:id', (req, res) => {
+  const { name, age, talk: { watchedAt, rate } } = req.body;
+  const talker = JSON.parse(fs.readFileSync('talker.json', 'utf-8'));
+  const newTalker = [...talker.filter((t) => t.id !== new(id)),
+   { name, age, id: new(id), talk: { watchedAt, rate } }];
+});
+ */
 module.exports = route;
