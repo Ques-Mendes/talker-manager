@@ -4,6 +4,8 @@ const fs = require('fs');
 
 const route = express.Router();
 
+const middlewares = require('../middlewares');
+
 route.get('/', (_req, res) => {
   const talker = JSON.parse(fs.readFileSync('talker.json', 'utf-8'));
   res.status(200).json(talker);
@@ -19,6 +21,19 @@ route.get('/:id', (req, res) => {
     return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
   }
   res.status(200).json(talker[0]);
+});
+
+route.use(middlewares.authorization);
+
+route.post('/', middlewares.nameValidation, async (req, res) => {
+  const { name, age, talk } = req.body;
+  const { watchedAt, rate } = talk;
+  const talker = JSON.parse(fs.readFileSync('talker.json', 'utf-8'));
+  const id = talker.length + 1;
+  const newTalker = [...talker, { name, age, id, talk: { watchedAt, rate } }];
+  await fs.writeFile('talker.json', newTalker);
+  console.log('new', newTalker);
+  res.status(201).json({ name, age, id, talk: { watchedAt, rate } });
 });
 
 module.exports = route;

@@ -2,7 +2,7 @@ const express = require('express');
 
 const crypto = require('crypto');
 
-const middlewares = require('./middlewares');
+const middlewares = require('../middlewares');
 
 const route = express.Router();
 
