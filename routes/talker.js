@@ -51,4 +51,13 @@ middlewares.ageValidation, middlewares.talkValidation,
   return res.status(200).json({ name, age, id: Number(id), talk: { watchedAt, rate } });
 });
 
+route.delete('/:id', middlewares.authorization, (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+  const talker = readTalker();
+  const newTalker = talker.filter((t) => t.id !== Number(id));
+  fs.writeFileSync('talker.json', JSON.stringify(newTalker));
+  return res.status(204).end();
+});
+
 module.exports = route;
