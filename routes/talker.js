@@ -17,11 +17,12 @@ route.get('/', (_req, res) => {
 route.get('/:id', (req, res) => {
   const { id } = req.params;
   const talker = readTalker();
-  const talkerById = talker.filter((t) => t.id === parseInt(id, 10)); 
+  const talkerById = talker.filter((t) => t.id === Number(id)); 
+  console.log(talkerById);
   if (!talkerById.length) {
     return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
   }
-  res.status(200).json(talker[0]);
+  return res.status(200).json(talkerById[0]);
 });
 
 route.post('/', middlewares.authorization, middlewares.nameValidation,
@@ -40,12 +41,14 @@ route.put('/:id', middlewares.authorization, middlewares.nameValidation,
 middlewares.ageValidation, middlewares.talkValidation,
  middlewares.watchedAtRateValidation, (req, res) => {
   const { id } = req.params;
+  // console.log(id);
   const { name, age, talk: { watchedAt, rate } } = req.body;
   const talker = readTalker();
-  const newTalker = [...talker.filter((t) => t.id !== id),
-   { name, age, id, talk: { watchedAt, rate } }];
+  const newTalker = [...talker.filter((t) => t.id !== Number(id)),
+   { name, age, id: Number(id), talk: { watchedAt, rate } }];
+    // console.log('is right?', id);
   fs.writeFileSync('talker.json', JSON.stringify(newTalker));
-  return res.status(200).json({ name, age, id, talk: { watchedAt, rate } });
+  return res.status(200).json({ name, age, id: Number(id), talk: { watchedAt, rate } });
 });
 
 module.exports = route;
