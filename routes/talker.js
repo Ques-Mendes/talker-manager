@@ -14,6 +14,16 @@ route.get('/', (_req, res) => {
   return res.status(200).json(talker);
 });
 
+route.get('/search', middlewares.authorization, (req, res) => {
+  const { q } = req.query;
+  const talker = readTalker();
+  if (!q) return res.status(200).json(talker);
+  const filteredTalker = talker.filter((t) => (
+    t.name.toUpperCase().includes(q.toUpperCase())));
+  if (!filteredTalker) return res.status(200).json(filteredTalker);
+  return res.status(200).json([]);
+});
+
 route.get('/:id', (req, res) => {
   const { id } = req.params;
   const talker = readTalker();
@@ -41,19 +51,16 @@ route.put('/:id', middlewares.authorization, middlewares.nameValidation,
 middlewares.ageValidation, middlewares.talkValidation,
  middlewares.watchedAtRateValidation, (req, res) => {
   const { id } = req.params;
-  // console.log(id);
   const { name, age, talk: { watchedAt, rate } } = req.body;
   const talker = readTalker();
   const newTalker = [...talker.filter((t) => t.id !== Number(id)),
    { name, age, id: Number(id), talk: { watchedAt, rate } }];
-    // console.log('is right?', id);
   fs.writeFileSync('talker.json', JSON.stringify(newTalker));
   return res.status(200).json({ name, age, id: Number(id), talk: { watchedAt, rate } });
 });
 
 route.delete('/:id', middlewares.authorization, (req, res) => {
   const { id } = req.params;
-  console.log(id);
   const talker = readTalker();
   const newTalker = talker.filter((t) => t.id !== Number(id));
   fs.writeFileSync('talker.json', JSON.stringify(newTalker));
