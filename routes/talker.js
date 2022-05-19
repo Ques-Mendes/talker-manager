@@ -20,8 +20,8 @@ route.get('/search', middlewares.authorization, (req, res) => {
   if (!q) return res.status(200).json(talker);
   const filteredTalker = talker.filter((t) => (
     t.name.toUpperCase().includes(q.toUpperCase())));
-  if (!filteredTalker) return res.status(200).json(filteredTalker);
-  return res.status(200).json([]);
+  if (!filteredTalker) return res.status(200).json([]);
+  return res.status(200).json(filteredTalker);
 });
 
 route.get('/:id', (req, res) => {
